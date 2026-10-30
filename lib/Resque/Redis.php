@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Wrap Credis to add namespace support and various helper methods.
  *
@@ -33,7 +34,7 @@ class Resque_Redis
      * @var array List of all commands in Redis that supply a key as their
      *	first argument. Used to prefix keys with the Resque namespace.
      */
-    private $keyCommands = array(
+    private $keyCommands = [
         'exists',
         'del',
         'type',
@@ -79,7 +80,7 @@ class Resque_Redis
         'sort',
         'rename',
         'rpoplpush',
-    );
+    ];
     // sinterstore
     // sunion
     // sunionstore
@@ -147,7 +148,7 @@ class Resque_Redis
             if ($database !== null) {
                 $this->driver->select($database);
             }
-        } catch(CredisException $e) {
+        } catch (CredisException $e) {
             throw new Resque_RedisException('Error communicating with Redis: ' . $e->getMessage(), 0, $e);
         }
     }
@@ -172,20 +173,20 @@ class Resque_Redis
             // Use a sensible default for an empty DNS string
             $dsn = 'redis://' . self::DEFAULT_HOST;
         }
-        if(substr($dsn, 0, 7) === 'unix://') {
-            return array(
+        if (substr($dsn, 0, 7) === 'unix://') {
+            return [
                 $dsn,
                 null,
                 false,
                 null,
                 null,
                 null,
-            );
+            ];
         }
         $parts = parse_url($dsn);
 
         // Check the URI scheme
-        $validSchemes = array('redis', 'tcp');
+        $validSchemes = ['redis', 'tcp'];
         if (isset($parts['scheme']) && !in_array($parts['scheme'], $validSchemes)) {
             throw new \InvalidArgumentException("Invalid DSN. Supported schemes are " . implode(', ', $validSchemes));
         }
@@ -211,20 +212,20 @@ class Resque_Redis
         $pass = isset($parts['pass']) ? $parts['pass'] : false;
 
         // Convert the query string into an associative array
-        $options = array();
+        $options = [];
         if (isset($parts['query'])) {
             // Parse the query string into an array
             parse_str($parts['query'], $options);
         }
 
-        return array(
+        return [
             $parts['host'],
             $port,
             $database,
             $user,
             $pass,
             $options,
-        );
+        ];
     }
 
     /**

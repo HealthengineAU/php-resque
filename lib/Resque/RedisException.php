@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Redis related exceptions
  *

@@ -1,10 +1,6 @@
 version: 2.1
 
 executors:
-  php81:
-    docker:
-      - image: cimg/php:8.1
-    resource_class: small
   php82:
     docker:
       - image: cimg/php:8.2
@@ -12,6 +8,14 @@ executors:
   php83:
     docker:
       - image: cimg/php:8.3
+    resource_class: small
+  php84:
+    docker:
+      - image: cimg/php:8.4
+    resource_class: small
+  php85:
+    docker:
+      - image: cimg/php:8.5
     resource_class: small
 
 jobs:
@@ -27,7 +31,7 @@ jobs:
       - run: composer update
       - run: composer analyse
   lint:
-    executor: php83
+    executor: php85
     steps:
       - checkout
       - run: sudo apt-get update -qq && sudo apt-get install --no-install-recommends --no-install-suggests -qq redis
@@ -52,9 +56,9 @@ workflows:
       - analyse:
           matrix:
             parameters:
-              php_executor: [php81, php82, php83]
+              php_executor: [php82, php83, php84, php85]
       - lint
       - test:
           matrix:
             parameters:
-              php_executor: [php81, php82, php83]
+              php_executor: [php82, php83, php84, php85]

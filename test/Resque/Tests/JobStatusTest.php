@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Resque_Job_Status tests.
  *
