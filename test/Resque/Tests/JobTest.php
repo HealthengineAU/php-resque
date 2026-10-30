@@ -47,7 +47,7 @@ class Resque_Tests_JobTest extends Resque_Tests_TestCase
         Resque::enqueue('jobs', 'Test_Job');
 
         $job = Resque_Job::reserve('jobs');
-        if($job == false) {
+        if ($job == false) {
             $this->fail('Job could not be reserved.');
         }
         $this->assertEquals('jobs', $job->queue);
@@ -64,17 +64,17 @@ class Resque_Tests_JobTest extends Resque_Tests_TestCase
 
     public function testQueuedJobReturnsExactSamePassedInArguments()
     {
-        $args = array(
+        $args = [
             'int' => 123,
-            'numArray' => array(
+            'numArray' => [
                 1,
                 2,
-            ),
-            'assocArray' => array(
+            ],
+            'assocArray' => [
                 'key1' => 'value1',
                 'key2' => 'value2',
-            ),
-        );
+            ],
+        ];
         Resque::enqueue('jobs', 'Test_Job', $args);
         $job = Resque_Job::reserve('jobs');
 
@@ -90,17 +90,17 @@ class Resque_Tests_JobTest extends Resque_Tests_TestCase
 
     public function testRecreatedJobMatchesExistingJob()
     {
-        $args = array(
+        $args = [
             'int' => 123,
-            'numArray' => array(
+            'numArray' => [
                 1,
                 2,
-            ),
-            'assocArray' => array(
+            ],
+            'assocArray' => [
                 'key1' => 'value1',
                 'key2' => 'value2',
-            ),
-        );
+            ],
+        ];
 
         Resque::enqueue('jobs', 'Test_Job', $args);
         $job = Resque_Job::reserve('jobs');
@@ -116,10 +116,10 @@ class Resque_Tests_JobTest extends Resque_Tests_TestCase
 
     public function testFailedJobExceptionsAreCaught()
     {
-        $payload = array(
+        $payload = [
             'class' => 'Failing_Job',
             'args' => null,
-        );
+        ];
         $job = new Resque_Job('jobs', $payload);
         $job->worker = $this->worker;
 
@@ -149,13 +149,13 @@ class Resque_Tests_JobTest extends Resque_Tests_TestCase
 
     public function testJobWithSetUpCallbackFiresSetUp()
     {
-        $payload = array(
+        $payload = [
             'class' => 'Test_Job_With_SetUp',
-            'args' => array(
+            'args' => [
                 'somevar',
                 'somevar2',
-            ),
-        );
+            ],
+        ];
         $job = new Resque_Job('jobs', $payload);
         $job->perform();
 
@@ -164,13 +164,13 @@ class Resque_Tests_JobTest extends Resque_Tests_TestCase
 
     public function testJobWithTearDownCallbackFiresTearDown()
     {
-        $payload = array(
+        $payload = [
             'class' => 'Test_Job_With_TearDown',
-            'args' => array(
+            'args' => [
                 'somevar',
                 'somevar2',
-            ),
-        );
+            ],
+        ];
         $job = new Resque_Job('jobs', $payload);
         $job->perform();
 
@@ -179,14 +179,14 @@ class Resque_Tests_JobTest extends Resque_Tests_TestCase
 
     public function testNamespaceNaming()
     {
-        $fixture = array(
-            array('test' => 'more:than:one:with:', 'assertValue' => 'more:than:one:with:'),
-            array('test' => 'more:than:one:without', 'assertValue' => 'more:than:one:without:'),
-            array('test' => 'resque', 'assertValue' => 'resque:'),
-            array('test' => 'resque:', 'assertValue' => 'resque:'),
-        );
+        $fixture = [
+            ['test' => 'more:than:one:with:', 'assertValue' => 'more:than:one:with:'],
+            ['test' => 'more:than:one:without', 'assertValue' => 'more:than:one:without:'],
+            ['test' => 'resque', 'assertValue' => 'resque:'],
+            ['test' => 'resque:', 'assertValue' => 'resque:'],
+        ];
 
-        foreach($fixture as $item) {
+        foreach ($fixture as $item) {
             Resque_Redis::prefix($item['test']);
             $this->assertEquals(Resque_Redis::getPrefix(), $item['assertValue']);
         }
@@ -196,10 +196,10 @@ class Resque_Tests_JobTest extends Resque_Tests_TestCase
     {
         Resque_Redis::prefix('php');
         $queue = 'jobs';
-        $payload = array('another_value');
+        $payload = ['another_value'];
         Resque::enqueue($queue, 'Test_Job_With_TearDown', $payload);
 
-        $this->assertEquals(Resque::queues(), array('jobs'));
+        $this->assertEquals(Resque::queues(), ['jobs']);
         $this->assertEquals(Resque::size($queue), 1);
 
         Resque_Redis::prefix('resque');
@@ -237,7 +237,7 @@ class Resque_Tests_JobTest extends Resque_Tests_TestCase
         Resque::enqueue($queue, 'Test_Job_Dequeue1');
         Resque::enqueue($queue, 'Test_Job_Dequeue2');
         $this->assertEquals(Resque::size($queue), 2);
-        $test = array('Test_Job_Dequeue2');
+        $test = ['Test_Job_Dequeue2'];
         $this->assertEquals(Resque::dequeue($queue, $test), 1);
         $this->assertEquals(Resque::size($queue), 1);
     }
@@ -249,7 +249,7 @@ class Resque_Tests_JobTest extends Resque_Tests_TestCase
         Resque::enqueue($queue, 'Test_Job_Dequeue2');
         Resque::enqueue($queue, 'Test_Job_Dequeue3');
         $this->assertEquals(Resque::size($queue), 3);
-        $test = array('Test_Job_Dequeue2', 'Test_Job_Dequeue3');
+        $test = ['Test_Job_Dequeue2', 'Test_Job_Dequeue3'];
         $this->assertEquals(Resque::dequeue($queue, $test), 2);
         $this->assertEquals(Resque::size($queue), 1);
     }
@@ -261,7 +261,7 @@ class Resque_Tests_JobTest extends Resque_Tests_TestCase
         Resque::enqueue($queue, 'Test_Job_Dequeue2');
         Resque::enqueue($queue, 'Test_Job_Dequeue3');
         $this->assertEquals(Resque::size($queue), 3);
-        $test = array('Test_Job_Dequeue4');
+        $test = ['Test_Job_Dequeue4'];
         $this->assertEquals(Resque::dequeue($queue, $test), 0);
         $this->assertEquals(Resque::size($queue), 3);
     }
@@ -273,7 +273,7 @@ class Resque_Tests_JobTest extends Resque_Tests_TestCase
         Resque::enqueue($queue, 'Test_Job_Dequeue2');
         Resque::enqueue($queue, 'Test_Job_Dequeue3');
         $this->assertEquals(Resque::size($queue), 3);
-        $test = array('Test_Job_Dequeue4', 'Test_Job_Dequeue1');
+        $test = ['Test_Job_Dequeue4', 'Test_Job_Dequeue1'];
         $this->assertEquals(Resque::dequeue($queue, $test), 1);
         $this->assertEquals(Resque::size($queue), 2);
     }
@@ -284,7 +284,7 @@ class Resque_Tests_JobTest extends Resque_Tests_TestCase
         Resque::enqueue($queue, 'Test_Job_Dequeue');
         $qid = Resque::enqueue($queue, 'Test_Job_Dequeue');
         $this->assertEquals(Resque::size($queue), 2);
-        $test = array('Test_Job_Dequeue' => $qid);
+        $test = ['Test_Job_Dequeue' => $qid];
         $this->assertEquals(Resque::dequeue($queue, $test), 1);
         $this->assertEquals(Resque::size($queue), 1);
     }
@@ -296,7 +296,7 @@ class Resque_Tests_JobTest extends Resque_Tests_TestCase
         $qid = Resque::enqueue($queue, 'Test_Job_Dequeue');
         $this->assertEquals(Resque::size($queue), 2);
         #qid right but class name is wrong
-        $test = array('Test_Job_Dequeue1' => $qid);
+        $test = ['Test_Job_Dequeue1' => $qid];
         $this->assertEquals(Resque::dequeue($queue, $test), 0);
         $this->assertEquals(Resque::size($queue), 2);
     }
@@ -307,7 +307,7 @@ class Resque_Tests_JobTest extends Resque_Tests_TestCase
         Resque::enqueue($queue, 'Test_Job_Dequeue');
         $qid = Resque::enqueue($queue, 'Test_Job_Dequeue');
         $this->assertEquals(Resque::size($queue), 2);
-        $test = array('Test_Job_Dequeue' => 'r4nD0mH4sh3dId');
+        $test = ['Test_Job_Dequeue' => 'r4nD0mH4sh3dId'];
         $this->assertEquals(Resque::dequeue($queue, $test), 0);
         $this->assertEquals(Resque::size($queue), 2);
     }
@@ -315,11 +315,11 @@ class Resque_Tests_JobTest extends Resque_Tests_TestCase
     public function testDequeueItemWithArg()
     {
         $queue = 'jobs';
-        $arg = array('foo' => 1, 'bar' => 2);
+        $arg = ['foo' => 1, 'bar' => 2];
         Resque::enqueue($queue, 'Test_Job_Dequeue9');
         Resque::enqueue($queue, 'Test_Job_Dequeue9', $arg);
         $this->assertEquals(Resque::size($queue), 2);
-        $test = array('Test_Job_Dequeue9' => $arg);
+        $test = ['Test_Job_Dequeue9' => $arg];
         $this->assertEquals(Resque::dequeue($queue, $test), 1);
         #$this->assertEquals(Resque::size($queue), 1);
     }
@@ -328,15 +328,15 @@ class Resque_Tests_JobTest extends Resque_Tests_TestCase
     {
         // GIVEN
         $queue = 'jobs';
-        $args = array('foo' => 1, 'bar' => 10);
-        $removeArgs = array('foo' => 1, 'bar' => 2);
+        $args = ['foo' => 1, 'bar' => 10];
+        $removeArgs = ['foo' => 1, 'bar' => 2];
         Resque::enqueue($queue, 'Test_Job_Dequeue9', $args);
         Resque::enqueue($queue, 'Test_Job_Dequeue9', $removeArgs);
         Resque::enqueue($queue, 'Test_Job_Dequeue9', $removeArgs);
         $this->assertEquals(Resque::size($queue), 3);
 
         // WHEN
-        $test = array('Test_Job_Dequeue9' => $removeArgs);
+        $test = ['Test_Job_Dequeue9' => $removeArgs];
         $removedItems = Resque::dequeue($queue, $test);
 
         // THEN
@@ -350,12 +350,12 @@ class Resque_Tests_JobTest extends Resque_Tests_TestCase
     public function testDequeueItemWithUnorderedArg()
     {
         $queue = 'jobs';
-        $arg = array('foo' => 1, 'bar' => 2);
-        $arg2 = array('bar' => 2, 'foo' => 1);
+        $arg = ['foo' => 1, 'bar' => 2];
+        $arg2 = ['bar' => 2, 'foo' => 1];
         Resque::enqueue($queue, 'Test_Job_Dequeue');
         Resque::enqueue($queue, 'Test_Job_Dequeue', $arg);
         $this->assertEquals(Resque::size($queue), 2);
-        $test = array('Test_Job_Dequeue' => $arg2);
+        $test = ['Test_Job_Dequeue' => $arg2];
         $this->assertEquals(Resque::dequeue($queue, $test), 1);
         $this->assertEquals(Resque::size($queue), 1);
     }
@@ -363,22 +363,22 @@ class Resque_Tests_JobTest extends Resque_Tests_TestCase
     public function testDequeueItemWithiWrongArg()
     {
         $queue = 'jobs';
-        $arg = array('foo' => 1, 'bar' => 2);
-        $arg2 = array('foo' => 2, 'bar' => 3);
+        $arg = ['foo' => 1, 'bar' => 2];
+        $arg2 = ['foo' => 2, 'bar' => 3];
         Resque::enqueue($queue, 'Test_Job_Dequeue');
         Resque::enqueue($queue, 'Test_Job_Dequeue', $arg);
         $this->assertEquals(Resque::size($queue), 2);
-        $test = array('Test_Job_Dequeue' => $arg2);
+        $test = ['Test_Job_Dequeue' => $arg2];
         $this->assertEquals(Resque::dequeue($queue, $test), 0);
         $this->assertEquals(Resque::size($queue), 2);
     }
 
     public function testUseDefaultFactoryToGetJobInstance()
     {
-        $payload = array(
+        $payload = [
             'class' => 'Some_Job_Class',
             'args' => null,
-        );
+        ];
         $job = new Resque_Job('jobs', $payload);
         $instance = $job->getInstance();
         $this->assertInstanceOf('Some_Job_Class', $instance);
@@ -386,10 +386,10 @@ class Resque_Tests_JobTest extends Resque_Tests_TestCase
 
     public function testUseFactoryToGetJobInstance()
     {
-        $payload = array(
+        $payload = [
             'class' => 'Some_Job_Class',
-            'args' => array(array()),
-        );
+            'args' => [[]],
+        ];
         $job = new Resque_Job('jobs', $payload);
         $factory = new Some_Stub_Factory();
         $job->setJobFactory($factory);
@@ -399,10 +399,10 @@ class Resque_Tests_JobTest extends Resque_Tests_TestCase
 
     public function testDoNotUseFactoryToGetInstance()
     {
-        $payload = array(
+        $payload = [
             'class' => 'Some_Job_Class',
-            'args' => array(array()),
-        );
+            'args' => [[]],
+        ];
         $job = new Resque_Job('jobs', $payload);
         $factory = $this->createMock(Resque_Job_FactoryInterface::class);
         $testJob = $this->createMock(Resque_JobInterface::class);

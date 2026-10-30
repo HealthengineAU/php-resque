@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Status tracker/information for a job.
  *
@@ -27,10 +28,10 @@ class Resque_Job_Status
     /**
      * @var array Array of statuses that are considered final/complete.
      */
-    private static $completeStatuses = array(
+    private static $completeStatuses = [
         self::STATUS_FAILED,
         self::STATUS_COMPLETE,
-    );
+    ];
 
     /**
      * Setup a new instance of the job monitor class for the supplied job ID.
@@ -50,11 +51,11 @@ class Resque_Job_Status
      */
     public static function create($id)
     {
-        $statusPacket = array(
+        $statusPacket = [
             'status' => self::STATUS_WAITING,
             'updated' => time(),
             'started' => time(),
-        );
+        ];
         Resque::redis()->set('job:' . $id . ':status', json_encode($statusPacket));
     }
 
@@ -66,11 +67,11 @@ class Resque_Job_Status
      */
     public function isTracking()
     {
-        if($this->isTracking === false) {
+        if ($this->isTracking === false) {
             return false;
         }
 
-        if(!Resque::redis()->exists((string) $this)) {
+        if (!Resque::redis()->exists((string) $this)) {
             $this->isTracking = false;
             return false;
         }
@@ -86,18 +87,18 @@ class Resque_Job_Status
      */
     public function update($status)
     {
-        if(!$this->isTracking()) {
+        if (!$this->isTracking()) {
             return;
         }
 
-        $statusPacket = array(
+        $statusPacket = [
             'status' => $status,
             'updated' => time(),
-        );
+        ];
         Resque::redis()->set((string) $this, json_encode($statusPacket));
 
         // Expire the status for completed jobs after 24 hours
-        if(in_array($status, self::$completeStatuses)) {
+        if (in_array($status, self::$completeStatuses)) {
             Resque::redis()->expire((string) $this, 86400);
         }
     }
@@ -110,12 +111,12 @@ class Resque_Job_Status
      */
     public function get()
     {
-        if(!$this->isTracking()) {
+        if (!$this->isTracking()) {
             return false;
         }
 
         $statusPacket = json_decode(Resque::redis()->get((string) $this), true);
-        if(!$statusPacket) {
+        if (!$statusPacket) {
             return false;
         }
 

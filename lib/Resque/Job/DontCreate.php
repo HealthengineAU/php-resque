@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Exception to be thrown if while enqueuing a job it should not be created.
  *

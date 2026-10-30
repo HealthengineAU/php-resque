@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Resque_Stat tests.
  *

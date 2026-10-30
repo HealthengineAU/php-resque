@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Base Resque class.
  *
@@ -76,7 +77,7 @@ class Resque
      */
     public static function fork()
     {
-        if(!function_exists('pcntl_fork')) {
+        if (!function_exists('pcntl_fork')) {
             return false;
         }
 
@@ -85,7 +86,7 @@ class Resque
         self::$redis = null;
 
         $pid = pcntl_fork();
-        if($pid === -1) {
+        if ($pid === -1) {
             throw new RuntimeException('Unable to fork child worker.');
         }
 
@@ -124,7 +125,7 @@ class Resque
     {
         $item = self::redis()->lpop('queue:' . $queue);
 
-        if(!$item) {
+        if (!$item) {
             return;
         }
 
@@ -138,9 +139,9 @@ class Resque
      * @param array $items
      * @return integer number of deleted items
      */
-    public static function dequeue($queue, $items = array())
+    public static function dequeue($queue, $items = [])
     {
-        if(count($items) > 0) {
+        if (count($items) > 0) {
             return self::removeItems($queue, $items);
         } else {
             return self::removeList($queue);
@@ -170,14 +171,14 @@ class Resque
      */
     public static function blpop(array $queues, $timeout)
     {
-        $list = array();
-        foreach($queues as $queue) {
+        $list = [];
+        foreach ($queues as $queue) {
             $list[] = 'queue:' . $queue;
         }
 
         $item = self::redis()->blpop($list, (int) $timeout);
 
-        if(!$item) {
+        if (!$item) {
             return;
         }
 
@@ -188,10 +189,10 @@ class Resque
          */
         $queue = substr($item[0], strlen(self::redis()->getPrefix() . 'queue:'));
 
-        return array(
+        return [
             'queue'   => $queue,
             'payload' => json_decode($item[1], true),
-        );
+        ];
     }
 
     /**
@@ -219,15 +220,15 @@ class Resque
     public static function enqueue($queue, $class, $args = null, $trackStatus = false)
     {
         $id         = Resque::generateJobId();
-        $hookParams = array(
+        $hookParams = [
             'class' => $class,
             'args'  => $args,
             'queue' => $queue,
             'id'    => $id,
-        );
+        ];
         try {
             Resque_Event::trigger('beforeEnqueue', $hookParams);
-        } catch(Resque_Job_DontCreate $e) {
+        } catch (Resque_Job_DontCreate $e) {
             return false;
         }
 
@@ -256,8 +257,8 @@ class Resque
     public static function queues()
     {
         $queues = self::redis()->smembers('queues');
-        if(!is_array($queues)) {
-            $queues = array();
+        if (!is_array($queues)) {
+            $queues = [];
         }
         return $queues;
     }
@@ -274,7 +275,7 @@ class Resque
      * @param array $items
      * @return integer number of deleted items
      */
-    private static function removeItems($queue, $items = array())
+    private static function removeItems($queue, $items = [])
     {
         $counter = 0;
         $originalQueue = 'queue:' . $queue;
@@ -287,7 +288,7 @@ class Resque
             $string = self::redis()->rpoplpush($originalQueue, self::redis()->getPrefix() . $tempQueue);
 
             if (!empty($string)) {
-                if(self::matchItem($string, $items)) {
+                if (self::matchItem($string, $items)) {
                     self::redis()->rpop($tempQueue);
                     $counter++;
                 } else {
@@ -328,17 +329,17 @@ class Resque
     {
         $decoded = json_decode($string, true);
 
-        foreach($items as $key => $val) {
+        foreach ($items as $key => $val) {
             # class name only  ex: item[0] = ['class']
             if (is_numeric($key)) {
-                if($decoded['class'] == $val) {
+                if ($decoded['class'] == $val) {
                     return true;
                 }
                 # class name with args , example: item[0] = ['class' => {'foo' => 1, 'bar' => 2}]
             } elseif (is_array($val)) {
                 $decodedArgs = (array) $decoded['args'][0];
-                if ($decoded['class'] == $key &&
-                count($decodedArgs) > 0 && count(array_diff($decodedArgs, $val)) == 0) {
+                if ($decoded['class'] == $key
+                && count($decodedArgs) > 0 && count(array_diff($decodedArgs, $val)) == 0) {
                     return true;
                 }
                 # class name with ID, example: item[0] = ['class' => 'id']

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Resque event/plugin system class
  *
@@ -11,7 +12,7 @@ class Resque_Event
     /**
      * @var array Array containing all registered callbacks, indexked by event name.
      */
-    private static $events = array();
+    private static $events = [];
 
     /**
      * Raise a given event with the supplied data.
@@ -23,7 +24,7 @@ class Resque_Event
     public static function trigger($event, $data = null)
     {
         if (!is_array($data)) {
-            $data = array($data);
+            $data = [$data];
         }
 
         if (empty(self::$events[$event])) {
@@ -50,7 +51,7 @@ class Resque_Event
     public static function listen($event, $callback)
     {
         if (!isset(self::$events[$event])) {
-            self::$events[$event] = array();
+            self::$events[$event] = [];
         }
 
         self::$events[$event][] = $callback;
@@ -83,6 +84,6 @@ class Resque_Event
      */
     public static function clearListeners()
     {
-        self::$events = array();
+        self::$events = [];
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Resque default logger PSR-3 compliant
  *
@@ -52,10 +53,10 @@ class Resque_Log extends Psr\Log\AbstractLogger
      * @param  array   $context  Array of variables to use in message
      * @return string
      */
-    public function interpolate($message, array $context = array())
+    public function interpolate($message, array $context = [])
     {
         // build a replacement array with braces around the context keys
-        $replace = array();
+        $replace = [];
         foreach ($context as $key => $val) {
             $replace['{' . $key . '}'] = $val;
         }

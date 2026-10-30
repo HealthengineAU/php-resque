@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Resque test bootstrap file - sets up a test environment.
  *
@@ -23,14 +24,14 @@ define('REDIS_CONF', TEST_MISC . '/redis.conf');
 
 // Attempt to start our own redis instance for tesitng.
 exec('which redis-server', $output, $returnVar);
-if($returnVar != 0) {
+if ($returnVar != 0) {
     echo "Cannot find redis-server in path. Please make sure redis is installed.\n";
     exit(1);
 }
 
 exec('cd ' . TEST_MISC . '; redis-server ' . REDIS_CONF, $output, $returnVar);
 usleep(500000);
-if($returnVar != 0) {
+if ($returnVar != 0) {
     echo "Cannot start redis-server.\n";
     exit(1);
 
@@ -38,7 +39,7 @@ if($returnVar != 0) {
 
 // Get redis port from conf
 $config = file_get_contents(REDIS_CONF);
-if(!preg_match('#^\s*port\s+([0-9]+)#m', $config, $matches)) {
+if (!preg_match('#^\s*port\s+([0-9]+)#m', $config, $matches)) {
     echo "Could not determine redis port from redis.conf";
     exit(1);
 }
@@ -52,7 +53,7 @@ function killRedis($pid)
         return; // don't kill from a forked worker
     }
     $config = file_get_contents(REDIS_CONF);
-    if(!preg_match('#^\s*pidfile\s+([^\s]+)#m', $config, $matches)) {
+    if (!preg_match('#^\s*pidfile\s+([^\s]+)#m', $config, $matches)) {
         return;
     }
 
@@ -61,29 +62,29 @@ function killRedis($pid)
         $pid = trim(file_get_contents($pidFile));
         posix_kill((int) $pid, 9);
 
-        if(is_file($pidFile)) {
+        if (is_file($pidFile)) {
             unlink($pidFile);
         }
     }
 
     // Remove the redis database
-    if(!preg_match('#^\s*dir\s+([^\s]+)#m', $config, $matches)) {
+    if (!preg_match('#^\s*dir\s+([^\s]+)#m', $config, $matches)) {
         return;
     }
     $dir = $matches[1];
 
-    if(!preg_match('#^\s*dbfilename\s+([^\s]+)#m', $config, $matches)) {
+    if (!preg_match('#^\s*dbfilename\s+([^\s]+)#m', $config, $matches)) {
         return;
     }
 
     $filename = TEST_MISC . '/' . $dir . '/' . $matches[1];
-    if(is_file($filename)) {
+    if (is_file($filename)) {
         unlink($filename);
     }
 }
 register_shutdown_function('killRedis', getmypid());
 
-if(function_exists('pcntl_signal')) {
+if (function_exists('pcntl_signal')) {
     // Override INT and TERM signals, so they do a clean shutdown and also
     // clean up redis-server as well.
     function sigint()

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Exception to be thrown if a job should not be performed/run.
  *
